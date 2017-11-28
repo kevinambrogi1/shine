@@ -33,6 +33,7 @@ gem 'foreman'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
+gem 'faker'
 
 # Use Devise for authentication
 gem 'devise'
