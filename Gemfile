@@ -42,12 +42,20 @@ gem 'bower-rails'
 # Uses Webpacker
 gem 'webpacker'
 
+# SCOUT Apm profiling tool
+# run SCOUT_DEV_TRACE=true rails server locally
+# added command to Procfile
+gem 'scout_apm'
+
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   # Adds support for Capybara system testing and selenium driver
   gem 'capybara', '~> 2.13'
   gem 'selenium-webdriver'
+  # Profiling with meta_ request chrome extension
+  gem 'meta_request'
 end
 
 group :development do
