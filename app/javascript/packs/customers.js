@@ -4,6 +4,7 @@ import { Component, NgModule    } from "@angular/core";
 import { BrowserModule          } from "@angular/platform-browser";
 import { FormsModule            } from "@angular/forms";
 import { platformBrowserDynamic } from "@angular/platform-browser-dynamic";
+import { Http,HttpModule } from "@angular/http";
 
 var CustomerSearchComponent = Component({
   selector: "shine-customer-search",
@@ -13,18 +14,12 @@ var CustomerSearchComponent = Component({
   </header> \
   <section class="search-form"> \
   <form> \
-  <div class="input-group input-group-lg"> \
   <label for="keywords" class="sr-only">Keywords></label> \
   <input type="text" id="keywords" name="keywords" \
   placeholder="First Name, Last Name, or Email Address"\
-  class="form-control input-lg" \
-  bindon-ngModel="keywords"> \
-  <span class="input-group-btn"> \
-  <input type="submit" value="Find Customers"\
-  class="btn btn-primary btn-lg" \
-  on-click="search()"> \
-  </span> \
-  </div> \
+  bind-ngModel="keywords" \
+  on-ngModelChange="search($event)" \
+  class="form-control input-lg">\
   </form> \
   </section> \
   <section class="search-results"> \
@@ -32,32 +27,51 @@ var CustomerSearchComponent = Component({
   <h1 class="h3">Results</h1> \
   </header> \
   <ol class="list-group"> \
-  <li class="list-group-item clearfix"> \
+  <li *ngFor="let customer of customers" \
+  class="list-group-item clearfix"> \
   <h3 class="pull-right"> \
   <small class="text-uppercase">Joined</small> \
-  2016-01-01\
+  {{customer.created_at}} \
   </h3> \
   <h2 class="h3"> \
-  Pat Smith\
-  <small>psmith34</small> \
+  {{customer.first_name}} {{customer.last_name}} \
+  <small>{{customer.username}}</small> \
   </h2> \
-  <h4>pat.smith@example.com</h4> \
+  <h4>{{customer.email}}</h4> \
   </li> \
   </ol> \
   </section> \
   '
 }).Class({
-  constructor: function() {
+  constructor: [
+  Http,
+  function(http) {
+    this.customers = null;
     this.keywords = null;
-  },
-  search: function() {
-    alert("Searched for: " + this.keywords);
+    this.http = http;
   }
-})
-;
+  ],
+  search: function($event) {
+   var self = this;
+   self.keywords = $event;
+   if (self.keywords.length < 3) {
+     return;
+   }
+   self.http.get(
+     "/customers.json?keywords=" + self.keywords
+     ).subscribe(
+     function(response) {
+       self.customers = response.json().customers;
+     },
+     function(response) {
+      window.alert(response);
+    }
+    );
+   }
+ });
 
 var CustomerAppModule = NgModule({
-  imports:      [ BrowserModule, FormsModule ],
+  imports:      [ BrowserModule, FormsModule, HttpModule ],
   declarations: [ CustomerSearchComponent ],
   bootstrap:    [ CustomerSearchComponent ]
 })
@@ -66,3 +80,41 @@ var CustomerAppModule = NgModule({
 });
 
 platformBrowserDynamic().bootstrapModule(CustomerAppModule);
+
+var RESULTS = [
+{
+  first_name: "Pat",
+  last_name: "Smith",
+  username: "psmith",
+  email: "pat.smith@somewhere.net",
+  created_at: "2016-02-05",
+},
+{
+  first_name: "Patrick",
+  last_name: "Jones",
+  username: "pjpj",
+  email: "jones.p@business.net",
+  created_at: "2014-03-05",
+},
+{
+  first_name: "Patricia",
+  last_name: "Benjamin",
+  username: "pattyb",
+  email: "benjie@aol.info",
+  created_at: "2016-01-02",
+},
+{
+  first_name: "Patty",
+  last_name: "Patrickson",
+  username: "ppat",
+  email: "pppp@freemail.computer",
+  created_at: "2016-02-05",
+},
+{
+  first_name: "Jane",
+  last_name: "Patrick",
+  username: "janesays",
+  email: "janep@company.net",
+  created_at: "2013-01-05",
+},
+];
